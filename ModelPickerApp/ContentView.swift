@@ -29,11 +29,17 @@ struct ContentView : View {
         }
         return availableModels
     }()
+    
     var body: some View {
         ZStack(alignment: .bottom) {
+            // placing the AR View
             ARViewContainer(modelConfirmedForPlacement: self.$modelConfirmedforPlacement)
+            
+            // placing the confirmation buttons, when a Model is selected
             if(self.isPlacementEnabled){
                 PlaceMentButtonsView(isPlacementEnabled: self.$isPlacementEnabled, selectedModel: self.$selectedModel, modelConfirmedForPlacement: self.$modelConfirmedforPlacement)
+                
+            // placing the ModelPickerView when nothing is selected
             } else{
                 ModelPickerView(isPlacementEnebled: self.$isPlacementEnabled, selectedModel: self.$selectedModel, models: self.models)
             }
@@ -49,15 +55,18 @@ struct ARViewContainer: UIViewRepresentable {
     
     func makeUIView(context: Context) -> ARView {
         
+        // Configuring the AR Container with planedetection and environment textures
         let arView = ARView(frame: .zero)
         let config = ARWorldTrackingConfiguration()
         config.planeDetection = [.horizontal, .vertical]
         config.environmentTexturing = .automatic
         
+        // Configuring Scene Recon if supported
         if ARWorldTrackingConfiguration.supportsSceneReconstruction(.mesh){
             config.sceneReconstruction = .mesh
         }
         
+        // running the AR Container in the session
         arView.session.run(config)
         
         return arView
@@ -65,16 +74,24 @@ struct ARViewContainer: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
+        // getting the filename from the modelName
+        
         if let modelName = self.modelConfirmedForPlacement{
             print("DEBUG: Adding model to scene \(modelName)")
             let filename = modelName + ".usdz"
+            
+            // creating the ModelEntity
             let modelEntity = try!
                 ModelEntity.loadModel(named: filename)
-            let anchorEntity = AnchorEntity(plane: .any)
-            anchorEntity.addChild(modelEntity)
             
+            // creating the AnchorEntity
+            let anchorEntity = AnchorEntity(plane: .any)
+            // Adding the modelEntity to the Anchor
+            anchorEntity.addChild(modelEntity)
+            // Adding the Anchor to the Scene
             uiView.scene.addAnchor(anchorEntity)
             
+            // resetting the model value
             DispatchQueue.main.async {
                 self.modelConfirmedForPlacement = nil
             }
@@ -87,11 +104,12 @@ struct ARViewContainer: UIViewRepresentable {
 struct ModelPickerView : View {
     @Binding var isPlacementEnebled: Bool
     @Binding var selectedModel: String?
+    
     var models: [String]
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false){
             HStack(spacing: 30){
-                ForEach(0 ..< self.models.count){
+                ForEach(0 ..< self.models.count, id: \.self){
                     index in
                     Button(action: {
                         print("DEBUG: selected model with name \(self.models[index])")
