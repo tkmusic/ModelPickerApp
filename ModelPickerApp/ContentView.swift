@@ -23,7 +23,9 @@ struct ContentView : View {
                 filemanager.contentsOfDirectory(atPath: path) else{ return []
         }
         var availableModels: [String] = []
+        // finds the usdz files
         for filename in files where filename.hasSuffix("usdz"){
+            // removes the usdz extension and adds it to the availableModels array
             let modelName = filename.replacingOccurrences(of: ".usdz", with: "")
             availableModels.append(modelName)
         }
@@ -74,8 +76,8 @@ struct ARViewContainer: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
-        // getting the filename from the modelName
         
+        // getting the filename from the modelName
         if let modelName = self.modelConfirmedForPlacement{
             print("DEBUG: Adding model to scene \(modelName)")
             let filename = modelName + ".usdz"
@@ -113,7 +115,9 @@ struct ModelPickerView : View {
                     index in
                     Button(action: {
                         print("DEBUG: selected model with name \(self.models[index])")
+                        // enabling the PlaceMentButtonsView
                         self.isPlacementEnebled = true
+                        // setting the Model
                         self.selectedModel = self.models[index]
                     }){
                             Image(uiImage:
@@ -142,6 +146,7 @@ struct PlaceMentButtonsView : View {
             // cancel button
             Button(action: {
                 print("DEBUG: cancel model placement.")
+                // resetting the selected Model
                 self.resetPlacementParameters()
             }){
                 Image(systemName: "xmark")
@@ -154,7 +159,9 @@ struct PlaceMentButtonsView : View {
             // confirm button
             Button(action: {
                 print("DEBUG: confirm model placement.")
+                // setting the choosen model as model for placement
                 self.modelConfirmedForPlacement = self.selectedModel
+                // resetting the selected Model
                 self.resetPlacementParameters()
             }){
                 Image(systemName: "checkmark")
@@ -167,6 +174,7 @@ struct PlaceMentButtonsView : View {
         }
     }
     func resetPlacementParameters(){
+        // fubction to reset the placementenabled and selectedmodel variables
         self.isPlacementEnabled = false
         self.selectedModel = nil
     }
