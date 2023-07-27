@@ -45,9 +45,6 @@ struct ContentView : View {
             } else{
                 ModelPickerView(isPlacementEnebled: self.$isPlacementEnabled, selectedModel: self.$selectedModel, models: self.models)
             }
-            
-            
-            
         }
     }
 }
@@ -71,8 +68,8 @@ struct ARViewContainer: UIViewRepresentable {
         // running the AR Container in the session
         arView.session.run(config)
         
+        // returning the ARView to pass it to the updateUIView
         return arView
-        
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
@@ -97,10 +94,8 @@ struct ARViewContainer: UIViewRepresentable {
             DispatchQueue.main.async {
                 self.modelConfirmedForPlacement = nil
             }
-           
         }
     }
-    
 }
 
 struct ModelPickerView : View {
@@ -174,12 +169,11 @@ struct PlaceMentButtonsView : View {
         }
     }
     func resetPlacementParameters(){
-        // fubction to reset the placementenabled and selectedmodel variables
+        // function to reset the placementenabled and selectedmodel variables
         self.isPlacementEnabled = false
         self.selectedModel = nil
     }
 }
-
 
 #if DEBUG
 struct ContentView_Previews : PreviewProvider {
